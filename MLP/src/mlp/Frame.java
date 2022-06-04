@@ -6,19 +6,30 @@ import java.awt.FlowLayout;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 public class Frame extends JFrame{
-    //Fields for GUI
+    // Fields for GUI
     private MenuBar menuBar = null;
     private Menu menu = null, dataset = null, education = null;
     private MenuItem[] menuItems = null, datasetItems = null, educationItems = null;
     private static JLabel label = null;
     private final String information, about;
+    // Fields for training
+    private ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
+    private boolean canTrainData;
     
     Frame(String title) {
-        //Configuration of display window
+        // Configuration of display window
         super(title);
         setResizable(false);
         this.getContentPane().setBackground(Color.lightGray);
@@ -40,7 +51,7 @@ public class Frame extends JFrame{
         }
         
         datasetItems = new MenuItem[1];
-        datasetItems[0] = new MenuItem("Load dataset");
+        datasetItems[0] = new MenuItem("Load train dataset");
         for (short i=0; i<datasetItems.length; i++)
             dataset.add(datasetItems[i]);
         
@@ -63,7 +74,88 @@ public class Frame extends JFrame{
         this.add(label);
     }
     
-    private void loadDataset() {}
+    private void loadDataset() {
+        if (!this.canTrainData) {
+            //Load train dataset
+            setTextLabel("<html><h2 align = 'center'>Loading patterns..</h2></html>");
+
+            //Permisions for MAC devices to see files in Download folder
+            System.setProperty("apple.awt.fileDialogForDirectories", "true");
+
+            ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
+            int dimension = -1;
+            boolean isValid = true;
+
+            //Prompt the user to choose a .txt file from his system
+            JFileChooser chooser=new JFileChooser();
+            int returnVal = chooser.showOpenDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                String filename = chooser.getSelectedFile().getAbsolutePath();
+                try {
+                    FileReader file = new FileReader(filename);
+                    try (Scanner in = new Scanner(file)) {
+                        int i = 0;
+                        //Read the file line-by-line
+                        while(in.hasNextLine())  {
+                            if (isValid) {
+                                String line=in.nextLine();
+
+                                ArrayList <Double> newPattern = new ArrayList<>();
+                                String[] characteristics = line.split(",");
+                                if (i == 0) {
+                                    dimension = characteristics.length;
+                                    for (String characteristic : characteristics) {
+                                        newPattern.add(Double.parseDouble(characteristic));
+                                    }
+                                    patterns.add(newPattern);
+                                }else if (characteristics.length == dimension) {
+                                    for (String characteristic : characteristics) {
+                                        newPattern.add(Double.parseDouble(characteristic));
+                                    }
+                                    patterns.add(newPattern);
+                                }else
+                                    isValid = false;
+                            }
+                        }
+
+                        if (isValid) {
+                            this.canTrainData = true;
+                            this.patterns = patterns;
+                            setTextLabel("<html><h2 align = 'center'>Ready Data<br/>Go to Train</h2></html>");
+                        }
+                    }
+                }catch (FileNotFoundException | NumberFormatException ex) {
+                    setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
+                    isValid = false;
+                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }else {
+                isValid = false;
+                //The user clicks on Cancel button
+                //when we suggest him to select a file from his system
+                setTextLabel("<html><br/><br/><h2 align = 'center'>Data upload canceled</h2></html>");
+
+                String text = "Want to load file now?";
+                String title = "You cancelled loading..";
+                int optionType = JOptionPane.OK_CANCEL_OPTION;
+                int result = JOptionPane.showConfirmDialog(null, text, title, optionType);
+                if (result == JOptionPane.OK_OPTION) {
+                    setTextLabel("<html><h2>Load dataset...</h2></html>");
+                    loadDataset();     
+                }
+            }
+        }else {
+            String text = "Want to load another file now?";
+            String title = "Loading..";
+            int optionType = JOptionPane.OK_CANCEL_OPTION;
+            int result = JOptionPane.showConfirmDialog(null, text, title, optionType);
+            if (result == JOptionPane.OK_OPTION) {
+                this.canTrainData = false;
+                setTextLabel("<html><h2>Load dataset...</h2></html>");
+                loadDataset();     
+            } 
+        }
+    }
     
     private void train() {}
     
@@ -74,7 +166,7 @@ public class Frame extends JFrame{
             String choice = (String)obj;
             switch (choice) {
                 case "Home" -> setTextLabel(information);
-                case "Load dataset" ->  loadDataset();
+                case "Load train dataset" ->  loadDataset();
                 case "About" -> setTextLabel(about);
                 case "Train" -> train();
             }
