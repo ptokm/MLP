@@ -53,9 +53,11 @@ public class Frame extends JFrame{
             menu.add(menuItems[i]);
         }
         
-        datasetItems = new MenuItem[2];
-        datasetItems[0] = new MenuItem("Load train dataset");
-        datasetItems[1] = new MenuItem("Load test dataset");
+        datasetItems = new MenuItem[4];
+        datasetItems[0] = new MenuItem("Load ionosphere train dataset");
+        datasetItems[1] = new MenuItem("Load ionosphere test dataset");
+        datasetItems[2] = new MenuItem("Load train dataset");
+        datasetItems[3] = new MenuItem("Load test dataset");
         for (short i=0; i<datasetItems.length; i++)
             dataset.add(datasetItems[i]);
         
@@ -78,7 +80,7 @@ public class Frame extends JFrame{
         this.add(label);
     }
     
-    private void loadTrainDataset() {
+    private void chooseTrainDataset() {
         if (!this.canTrainData) {
             //Load train dataset
             setTextLabel("<html><h2 align = 'center'>Loading patterns..</h2></html>");
@@ -86,17 +88,79 @@ public class Frame extends JFrame{
             //Permisions for MAC devices to see files in Download folder
             System.setProperty("apple.awt.fileDialogForDirectories", "true");
 
-            ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
-            int dimension = -1;
-            boolean isValid = true;
+            //Prompt the user to choose a .txt file from his system
+            JFileChooser chooser=new JFileChooser();
+            int returnVal = chooser.showOpenDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                String filename = chooser.getSelectedFile().getAbsolutePath();
+                this.loadTrainDataset(filename);
+            }else {
+                this.currentFileName = null;
+                //The user clicks on Cancel button
+                //when we suggest him to select a file from his system
+                setTextLabel("<html><br/><br/><h2 align = 'center'>Data upload canceled</h2></html>");
+
+                String text = "Want to load file now?";
+                String title = "You cancelled loading..";
+                int optionType = JOptionPane.OK_CANCEL_OPTION;
+                int result = JOptionPane.showConfirmDialog(null, text, title, optionType);
+                if (result == JOptionPane.OK_OPTION) {
+                    setTextLabel("<html><h2>Load dataset...</h2></html>");
+                    Frame.this.chooseTrainDataset();     
+                }
+            }
+        }else {
+            String text = "Want to load another file now?";
+            String title = "Loading..";
+            int optionType = JOptionPane.OK_CANCEL_OPTION;
+            int result = JOptionPane.showConfirmDialog(null, text, title, optionType);
+            if (result == JOptionPane.OK_OPTION) {
+                this.canTrainData = false;
+                setTextLabel("<html><h2>Load dataset...</h2></html>");
+                Frame.this.chooseTrainDataset();     
+            } 
+        }
+    }
+    
+    private void chooseTestDataset() {
+        if (this.canTrainData) {
+            //Load test dataset
+            setTextLabel("<html><h2 align = 'center'>Loading patterns..</h2></html>");
+
+            //Permisions for MAC devices to see files in Download folder
+            System.setProperty("apple.awt.fileDialogForDirectories", "true");
 
             //Prompt the user to choose a .txt file from his system
             JFileChooser chooser=new JFileChooser();
             int returnVal = chooser.showOpenDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 String filename = chooser.getSelectedFile().getAbsolutePath();
-                this.currentFileName = filename;
-                try {
+                this.loadTestDataset(filename);
+            } else {
+                //The user clicks on Cancel button
+                //when we suggest him to select a file from his system
+                setTextLabel("<html><br/><br/><h2 align = 'center'>Data upload canceled</h2></html>");
+
+                String text = "Want to load file now?";
+                String title = "You cancelled loading..";
+                int optionType = JOptionPane.OK_CANCEL_OPTION;
+                int result = JOptionPane.showConfirmDialog(null, text, title, optionType);
+                if (result == JOptionPane.OK_OPTION) {
+                    setTextLabel("<html><h2>Load dataset...</h2></html>");
+                    chooseTestDataset();     
+                }
+            }
+        } else {
+            setTextLabel("<html><h2>Unable to load test data because you have not <br/> trained the network before</h2></html>");
+        }
+    }
+    
+    private void loadTrainDataset(String filename) {
+        this.currentFileName = filename;
+        boolean isValid = true;
+        ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
+        int dimension = -1;
+        try {
                     FileReader file = new FileReader(filename);
                     try (Scanner in = new Scanner(file)) {
                         int i = 0;
@@ -139,53 +203,14 @@ public class Frame extends JFrame{
                     this.currentFileName = null;
                     Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }else {
-                isValid = false;
-                this.currentFileName = null;
-                //The user clicks on Cancel button
-                //when we suggest him to select a file from his system
-                setTextLabel("<html><br/><br/><h2 align = 'center'>Data upload canceled</h2></html>");
-
-                String text = "Want to load file now?";
-                String title = "You cancelled loading..";
-                int optionType = JOptionPane.OK_CANCEL_OPTION;
-                int result = JOptionPane.showConfirmDialog(null, text, title, optionType);
-                if (result == JOptionPane.OK_OPTION) {
-                    setTextLabel("<html><h2>Load dataset...</h2></html>");
-                    loadTrainDataset();     
-                }
-            }
-        }else {
-            String text = "Want to load another file now?";
-            String title = "Loading..";
-            int optionType = JOptionPane.OK_CANCEL_OPTION;
-            int result = JOptionPane.showConfirmDialog(null, text, title, optionType);
-            if (result == JOptionPane.OK_OPTION) {
-                this.canTrainData = false;
-                setTextLabel("<html><h2>Load dataset...</h2></html>");
-                loadTrainDataset();     
-            } 
-        }
     }
     
-    private void loadTestDataset() {
-        if (this.canTrainData) {
-            //Load test dataset
-            setTextLabel("<html><h2 align = 'center'>Loading patterns..</h2></html>");
-
-            //Permisions for MAC devices to see files in Download folder
-            System.setProperty("apple.awt.fileDialogForDirectories", "true");
-
-            ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
-            int dimension = this.patterns.get(0).size();
-            boolean isValid = true;
-
-            //Prompt the user to choose a .txt file from his system
-            JFileChooser chooser=new JFileChooser();
-            int returnVal = chooser.showOpenDialog(this);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                String filename = chooser.getSelectedFile().getAbsolutePath();
-                try {
+    private void loadTestDataset(String filename) {
+        ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
+        int dimension = this.patterns.get(0).size();
+        boolean isValid = true;
+            
+        try {
                     FileReader file = new FileReader(filename);
                     try (Scanner in = new Scanner(file)) {
                         //Read the file line-by-line
@@ -220,24 +245,6 @@ public class Frame extends JFrame{
                     isValid = false;
                     Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } else {
-                isValid = false;
-                //The user clicks on Cancel button
-                //when we suggest him to select a file from his system
-                setTextLabel("<html><br/><br/><h2 align = 'center'>Data upload canceled</h2></html>");
-
-                String text = "Want to load file now?";
-                String title = "You cancelled loading..";
-                int optionType = JOptionPane.OK_CANCEL_OPTION;
-                int result = JOptionPane.showConfirmDialog(null, text, title, optionType);
-                if (result == JOptionPane.OK_OPTION) {
-                    setTextLabel("<html><h2>Load dataset...</h2></html>");
-                    loadTestDataset();     
-                }
-            }
-        } else {
-            setTextLabel("<html><h2>Unable to load test data because you have not <br/> trained the network before</h2></html>");
-        }
     }
     
     private void train() {
@@ -255,18 +262,20 @@ public class Frame extends JFrame{
             setTextLabel("<html><h2>Cannot train</h2></html>");
         }
     }
-    
+
     //Action depending on the user's choice from the menu
     @Override
     public boolean action(Event event, Object obj) {
         if (event.target instanceof MenuItem) {
             String choice = (String)obj;
             switch (choice) {
-                case "Home"               -> setTextLabel(information);
-                case "Load train dataset" -> loadTrainDataset();
-                case "Load test dataset"  -> loadTestDataset();
-                case "About"              -> setTextLabel(about);
-                case "Back Propagation"   -> train();
+                case "Home"                           -> setTextLabel(information);
+                case "Load ionosphere train dataset"  -> loadTrainDataset("ionosphere_perceptron.train");
+                case "Load ionosphere test dataset"   -> loadTestDataset("ionosphere_perceptron.test");
+                case "Load train dataset"             -> chooseTrainDataset();
+                case "Load test dataset"              -> chooseTestDataset();
+                case "About"                          -> setTextLabel(about);
+                case "Back Propagation"               -> train();
             }
         }
         else
