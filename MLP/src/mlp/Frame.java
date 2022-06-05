@@ -57,7 +57,7 @@ public class Frame extends JFrame{
             dataset.add(datasetItems[i]);
         
         educationItems = new MenuItem[1];
-        educationItems[0] = new MenuItem("Train");
+        educationItems[0] = new MenuItem("Back Propagation");
         education.add(educationItems[0]);
         
         menuBar.add(menu);
@@ -168,8 +168,9 @@ public class Frame extends JFrame{
             int nodes = 1;
             int maxEpoches = 10;
             Algorithm algorithm = new Algorithm(this.patterns, nodes, maxEpoches);
-            if (algorithm.train()) {
-                setTextLabel("<html><h2>Trained the train dataset: " +this.currentFileName +"</h2></html>");
+            double train = algorithm.train();
+            if (train != 0.0) {
+                setTextLabel("<html><h2>Trained the train dataset: " +this.currentFileName +"<br/> with train error: " +train+" </h2></html>");
             }else {
                  setTextLabel("<html><h2>Cannot train the train dataset: " +this.currentFileName +"</h2></html>");
             }
@@ -187,7 +188,7 @@ public class Frame extends JFrame{
                 case "Home" -> setTextLabel(information);
                 case "Load train dataset" ->  loadDataset();
                 case "About" -> setTextLabel(about);
-                case "Train" -> train();
+                case "Back Propagation" -> train();
             }
         }
         else

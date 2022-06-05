@@ -75,18 +75,75 @@ public class Algorithm {
         return sum;
     }
     
-    public boolean train() {
+    public double sigder(double x) {
+        return sig(x) * (1.0 - sig(x));
+    }
+    
+    public ArrayList <Double> getPatternDeriv(ArrayList <Double> pattern) {
+        ArrayList <Double> patternDeriv = new ArrayList <>();
+        this._weights.forEach(_item -> {
+            patternDeriv.add(0.0);
+        });
+        
+        for (int i = 0; i < this._nodes; i++) {
+            double arg = 0.0;
+            
+            for (int j = 0; j < this._dimension; j++) {
+                int pos = (this._dimension + 2) * (i+1) - (this._dimension + 1) + (j+1);
+                arg += pattern.get(j+1) * this._weights.get(pos - 1);
+            }
+            arg += this._weights.get((this._dimension + 2) * (i+1) - 1);
+            double s = this.sig(arg);
+            double s1 = this.sigder(arg);
+            patternDeriv.set((this._dimension + 2) * (i+1) - (this._dimension + 1) - 1, s);
+            patternDeriv.set((this._dimension + 2) * (i+1) - 1, this._weights.get((this._dimension + 2) * (i+1) - (this._dimension + 1) - 1) * s1);
+            for (int j = 0; j < this._dimension; j++) {
+                int pos = (this._dimension + 2) * (i+1) - (this._dimension + 1) + j;
+                patternDeriv.set(pos - 1, this._weights.get((this._dimension + 2) * (i+1) - (this._dimension + 1) - 1) * pattern.get((j+1) - 1) * s1);
+            }
+        }
+        
+        return patternDeriv;
+    }
+    
+    public ArrayList <Double> getDeriv() {
+        ArrayList <Double> deriv = new ArrayList<>();
+        this._weights.forEach(_item -> {
+            deriv.add(0.0);
+        });
+        
+        for (int i = 0; i < this._patterns.size(); i++) {
+            ArrayList <Double> patternDeriv = getPatternDeriv(this._patterns.get(i));
+            double yx = this._patterns.get(i).get(this._dimension);
+            double ox = this.getOutput(this._patterns.get(i));
+            
+            
+            for (int j = 0; j < deriv.size(); j++) {
+                deriv.set(j, 2.0 * (ox - yx) * patternDeriv.get(j));
+            }
+        }
+        return deriv;
+    }
+    
+    public double train() {
         this.initializeWeights();
         this.findUniqueClasses();
         
+        double trainError = 0.0;
         for (int i = 0; i < this._maxEpoches; i++) {
-            double trainError = getTrainError();
-
+            trainError = getTrainError();
             if (trainError < 1e-5)
                break;
+            else {
+                ArrayList <Double> deriv = getDeriv();
+                
+                for (int j = 0; j < this._weights.size(); j++) {
+                    this._weights.set(j, this._weights.get(j) * 0.01 * deriv.get(j));
+                }
+            }
         }
         
-        return true;
+        return trainError;
     }
 
 }
