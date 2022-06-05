@@ -4,11 +4,19 @@ import java.util.ArrayList;
 
 public class Algorithm {
     private ArrayList <ArrayList <Double>> _patterns = new ArrayList<>(); // The last column is for the desired output
+    private ArrayList <ArrayList <Double>> _testPatterns = new ArrayList<>();
     private ArrayList <Double> _weights = new ArrayList<>();
     private ArrayList <Double> _uniqueOutputClasses = new ArrayList<>();
     private int _dimension = -1;
     private int _nodes = 1;
     private final int _maxEpoches;
+    
+    Algorithm() {
+        this._patterns = new ArrayList<>();
+        this._dimension = -1;
+        this._nodes = 1;
+        this._maxEpoches = 0;
+    }
     
     Algorithm(ArrayList <ArrayList <Double>> patterns, int nodes, int maxEpoches) {
         this._patterns = patterns;
@@ -146,4 +154,23 @@ public class Algorithm {
         return trainError;
     }
 
+    
+    /**
+     * @param testPatterns the _testPatterns to set
+     */
+    public void setTestPatterns(ArrayList <ArrayList <Double>> testPatterns) {
+        this._testPatterns = testPatterns;
+    }
+    
+    public double getTestError() {
+        double sum = 0.0;
+        
+        for (int i = 0; i < this._testPatterns.size(); i++) {
+            double yx = this._testPatterns.get(i).get(this._dimension); // The desired output
+            double ox = getOutput(this._testPatterns.get(i));
+            sum += (ox - yx) * (ox - yx);
+        }
+        
+        return sum;
+    }
 }

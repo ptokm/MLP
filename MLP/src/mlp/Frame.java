@@ -25,7 +25,9 @@ public class Frame extends JFrame{
     private static JLabel label = null;
     private final String information, about;
     // Fields for training
+    private Algorithm algorithm = new Algorithm();
     private ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
+    private ArrayList <ArrayList <Double>> testPatterns = new ArrayList<>();
     private boolean canTrainData;
     private String currentFileName;
     
@@ -51,8 +53,9 @@ public class Frame extends JFrame{
             menu.add(menuItems[i]);
         }
         
-        datasetItems = new MenuItem[1];
+        datasetItems = new MenuItem[2];
         datasetItems[0] = new MenuItem("Load train dataset");
+        datasetItems[1] = new MenuItem("Load test dataset");
         for (short i=0; i<datasetItems.length; i++)
             dataset.add(datasetItems[i]);
         
@@ -75,7 +78,7 @@ public class Frame extends JFrame{
         this.add(label);
     }
     
-    private void loadDataset() {
+    private void loadTrainDataset() {
         if (!this.canTrainData) {
             //Load train dataset
             setTextLabel("<html><h2 align = 'center'>Loading patterns..</h2></html>");
@@ -126,6 +129,8 @@ public class Frame extends JFrame{
                             this.canTrainData = true;
                             this.patterns = patterns;
                             setTextLabel("<html><h2 align = 'center'>Ready Data<br/>Go to Train</h2></html>");
+                        } else {
+                            setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
                         }
                     }
                 }catch (FileNotFoundException | NumberFormatException ex) {
@@ -147,7 +152,7 @@ public class Frame extends JFrame{
                 int result = JOptionPane.showConfirmDialog(null, text, title, optionType);
                 if (result == JOptionPane.OK_OPTION) {
                     setTextLabel("<html><h2>Load dataset...</h2></html>");
-                    loadDataset();     
+                    loadTrainDataset();     
                 }
             }
         }else {
@@ -158,8 +163,80 @@ public class Frame extends JFrame{
             if (result == JOptionPane.OK_OPTION) {
                 this.canTrainData = false;
                 setTextLabel("<html><h2>Load dataset...</h2></html>");
-                loadDataset();     
+                loadTrainDataset();     
             } 
+        }
+    }
+    
+    private void loadTestDataset() {
+        if (this.canTrainData) {
+            //Load test dataset
+            setTextLabel("<html><h2 align = 'center'>Loading patterns..</h2></html>");
+
+            //Permisions for MAC devices to see files in Download folder
+            System.setProperty("apple.awt.fileDialogForDirectories", "true");
+
+            ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
+            int dimension = this.patterns.get(0).size();
+            boolean isValid = true;
+
+            //Prompt the user to choose a .txt file from his system
+            JFileChooser chooser=new JFileChooser();
+            int returnVal = chooser.showOpenDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                String filename = chooser.getSelectedFile().getAbsolutePath();
+                try {
+                    FileReader file = new FileReader(filename);
+                    try (Scanner in = new Scanner(file)) {
+                        //Read the file line-by-line
+                        while(in.hasNextLine())  {
+                            if (isValid) {
+                                String line=in.nextLine();
+
+                                ArrayList <Double> newPattern = new ArrayList<>();
+                                String[] characteristics = line.split(",");
+                                if (characteristics.length == dimension) {
+                                    for (String characteristic : characteristics) {
+                                        newPattern.add(Double.parseDouble(characteristic));
+                                    }
+                                    patterns.add(newPattern);
+                                }else {
+                                    isValid = false;
+                                }
+                            }
+                        }
+
+                        if (isValid) {
+                            this.testPatterns = patterns;
+                            algorithm.setTestPatterns(this.testPatterns);
+                            double testError = algorithm.getTestError();
+                            setTextLabel("<html><h2 align = 'center'>The test dataset has "+testError + " train error</h2></html>");
+                        } else {
+                            setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
+                        }
+                    }
+                } catch (FileNotFoundException | NumberFormatException ex) {
+                    setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
+                    isValid = false;
+                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                isValid = false;
+                //The user clicks on Cancel button
+                //when we suggest him to select a file from his system
+                setTextLabel("<html><br/><br/><h2 align = 'center'>Data upload canceled</h2></html>");
+
+                String text = "Want to load file now?";
+                String title = "You cancelled loading..";
+                int optionType = JOptionPane.OK_CANCEL_OPTION;
+                int result = JOptionPane.showConfirmDialog(null, text, title, optionType);
+                if (result == JOptionPane.OK_OPTION) {
+                    setTextLabel("<html><h2>Load dataset...</h2></html>");
+                    loadTestDataset();     
+                }
+            }
+        } else {
+            setTextLabel("<html><h2>Unable to load test data because you have not <br/> trained the network before</h2></html>");
         }
     }
     
@@ -167,7 +244,7 @@ public class Frame extends JFrame{
         if (this.canTrainData) {
             int nodes = 1;
             int maxEpoches = 10;
-            Algorithm algorithm = new Algorithm(this.patterns, nodes, maxEpoches);
+            algorithm = new Algorithm(this.patterns, nodes, maxEpoches);
             double train = algorithm.train();
             if (train != 0.0) {
                 setTextLabel("<html><h2>Trained the train dataset: " +this.currentFileName +"<br/> with train error: " +train+" </h2></html>");
@@ -185,10 +262,11 @@ public class Frame extends JFrame{
         if (event.target instanceof MenuItem) {
             String choice = (String)obj;
             switch (choice) {
-                case "Home" -> setTextLabel(information);
-                case "Load train dataset" ->  loadDataset();
-                case "About" -> setTextLabel(about);
-                case "Back Propagation" -> train();
+                case "Home"               -> setTextLabel(information);
+                case "Load train dataset" -> loadTrainDataset();
+                case "Load test dataset"  -> loadTestDataset();
+                case "About"              -> setTextLabel(about);
+                case "Back Propagation"   -> train();
             }
         }
         else
