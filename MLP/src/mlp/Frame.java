@@ -27,6 +27,7 @@ public class Frame extends JFrame{
     // Fields for training
     private ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
     private boolean canTrainData;
+    private String currentFileName;
     
     Frame(String title) {
         // Configuration of display window
@@ -91,6 +92,7 @@ public class Frame extends JFrame{
             int returnVal = chooser.showOpenDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 String filename = chooser.getSelectedFile().getAbsolutePath();
+                this.currentFileName = filename;
                 try {
                     FileReader file = new FileReader(filename);
                     try (Scanner in = new Scanner(file)) {
@@ -113,8 +115,10 @@ public class Frame extends JFrame{
                                         newPattern.add(Double.parseDouble(characteristic));
                                     }
                                     patterns.add(newPattern);
-                                }else
+                                }else {
                                     isValid = false;
+                                    this.currentFileName = null;
+                                }
                             }
                         }
 
@@ -127,10 +131,12 @@ public class Frame extends JFrame{
                 }catch (FileNotFoundException | NumberFormatException ex) {
                     setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
                     isValid = false;
+                    this.currentFileName = null;
                     Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }else {
                 isValid = false;
+                this.currentFileName = null;
                 //The user clicks on Cancel button
                 //when we suggest him to select a file from his system
                 setTextLabel("<html><br/><br/><h2 align = 'center'>Data upload canceled</h2></html>");
@@ -157,7 +163,20 @@ public class Frame extends JFrame{
         }
     }
     
-    private void train() {}
+    private void train() {
+        if (this.canTrainData) {
+            int nodes = 1;
+            int maxEpoches = 10;
+            Algorithm algorithm = new Algorithm(this.patterns, nodes, maxEpoches);
+            if (algorithm.train()) {
+                setTextLabel("<html><h2>Trained the train dataset: " +this.currentFileName +"</h2></html>");
+            }else {
+                 setTextLabel("<html><h2>Cannot train the train dataset: " +this.currentFileName +"</h2></html>");
+            }
+        } else {
+            setTextLabel("<html><h2>Cannot train</h2></html>");
+        }
+    }
     
     //Action depending on the user's choice from the menu
     @Override
