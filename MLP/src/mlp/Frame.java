@@ -205,6 +205,11 @@ public class Frame extends JFrame{
     }
     
     private void loadTestDataset(String filename) {
+        if (Dataset.getPatterns() == null || Dataset.getPatterns().isEmpty()) {
+            setTextLabel("<html><h2>Unable to load test data because you have not <br/> trained the network before</h2></html>");
+            return;
+        }
+           
         ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
         int dimension = Dataset.getPatterns().get(0).size();
         boolean isValid = true;
