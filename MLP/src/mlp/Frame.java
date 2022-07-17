@@ -52,11 +52,13 @@ public class Frame extends JFrame{
             menuMenu.add(menuItems[i]);
         }
         
-        datasetItems = new MenuItem[4];
+        datasetItems = new MenuItem[6];
         datasetItems[0] = new MenuItem("Load ionosphere train dataset");
         datasetItems[1] = new MenuItem("Load ionosphere test dataset");
-        datasetItems[2] = new MenuItem("Load train dataset");
-        datasetItems[3] = new MenuItem("Load test dataset");
+        datasetItems[2] = new MenuItem("Load liver_perceptron train dataset");
+        datasetItems[3] = new MenuItem("Load liver_perceptron test dataset");
+        datasetItems[4] = new MenuItem("Load train dataset");
+        datasetItems[5] = new MenuItem("Load test dataset");
         for (short i=0; i<datasetItems.length; i++)
             datasetMenu.add(datasetItems[i]);
         
@@ -275,13 +277,15 @@ public class Frame extends JFrame{
         if (event.target instanceof MenuItem) {
             String choice = (String)obj;
             switch (choice) {
-                case "Home"                           -> setTextLabel(information);
-                case "Load ionosphere train dataset"  -> loadTrainDataset("ionosphere_perceptron.train");
-                case "Load ionosphere test dataset"   -> loadTestDataset("ionosphere_perceptron.test");
-                case "Load train dataset"             -> chooseTrainDataset();
-                case "Load test dataset"              -> chooseTestDataset();
-                case "About"                          -> setTextLabel(about);
-                case "Back Propagation"               -> train();
+                case "Home"                                 -> setTextLabel(information);
+                case "About"                                -> setTextLabel(about);
+                case "Load ionosphere train dataset"        -> loadTrainDataset("ionosphere_perceptron.train");
+                case "Load ionosphere test dataset"         -> loadTestDataset("ionosphere_perceptron.test");
+                case "Load liver_perceptron train dataset"  -> loadTrainDataset("liver_perceptron.test");
+                case "Load liver_perceptron test dataset"   -> loadTestDataset("liver_perceptron.test");
+                case "Load train dataset"                   -> chooseTrainDataset();
+                case "Load test dataset"                    -> chooseTestDataset();
+                case "Back Propagation"                     -> train();
             }
         }
         else

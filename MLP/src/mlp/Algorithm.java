@@ -9,7 +9,7 @@ public class Algorithm {
     private ArrayList <Double> _uniqueOutputClasses = new ArrayList<>();
     private int _dimension = -1;
     private int _nodes = 1;
-    private int _maxEpoches;
+    private final int _maxEpoches;
     
     Algorithm(int nodes, int maxEpoches) {
         this._patterns = Dataset.getPatterns();
