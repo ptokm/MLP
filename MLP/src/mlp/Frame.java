@@ -19,17 +19,17 @@ import javax.swing.JOptionPane;
 
 public class Frame extends JFrame{
     // Fields for GUI
-    private MenuBar menuBar = null;
-    private Menu menu = null, dataset = null, education = null;
-    private MenuItem[] menuItems = null, datasetItems = null, educationItems = null;
-    private static JLabel label = null;
+    private final MenuBar menuBar;
+    private final Menu menuMenu, datasetMenu, educationMenu;
+    private final MenuItem[] menuItems, datasetItems, educationItems;
+    private static JLabel label;
     private final String information, about;
     // Fields for training
-    private Algorithm algorithm = new Algorithm();
-    private ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
-    private ArrayList <ArrayList <Double>> testPatterns = new ArrayList<>();
-    private boolean canTrainData;
-    private String currentFileName;
+    private Algorithm _algorithm = new Algorithm();
+    private ArrayList <ArrayList <Double>> _patterns = new ArrayList<>();
+    private ArrayList <ArrayList <Double>> _testPatterns = new ArrayList<>();
+    private boolean _canTrainData;
+    private String _currentFileName;
     
     Frame(String title) {
         // Configuration of display window
@@ -42,15 +42,15 @@ public class Frame extends JFrame{
         
         //Menu configuration
         menuBar = new MenuBar();
-        menu = new Menu("MENU");
-        dataset = new Menu("DATASETS");
-        education = new Menu("TRAIN");
+        menuMenu = new Menu("MENU");
+        datasetMenu = new Menu("DATASETS");
+        educationMenu = new Menu("TRAIN");
         
         menuItems = new MenuItem[2];
         menuItems[0] = new MenuItem("Home");
         menuItems[1] = new MenuItem("About");
         for (short i=0; i<menuItems.length; i++) {
-            menu.add(menuItems[i]);
+            menuMenu.add(menuItems[i]);
         }
         
         datasetItems = new MenuItem[4];
@@ -59,15 +59,15 @@ public class Frame extends JFrame{
         datasetItems[2] = new MenuItem("Load train dataset");
         datasetItems[3] = new MenuItem("Load test dataset");
         for (short i=0; i<datasetItems.length; i++)
-            dataset.add(datasetItems[i]);
+            datasetMenu.add(datasetItems[i]);
         
         educationItems = new MenuItem[1];
         educationItems[0] = new MenuItem("Back Propagation");
-        education.add(educationItems[0]);
+        educationMenu.add(educationItems[0]);
         
-        menuBar.add(menu);
-        menuBar.add(dataset);
-        menuBar.add(education);
+        menuBar.add(menuMenu);
+        menuBar.add(datasetMenu);
+        menuBar.add(educationMenu);
         setMenuBar(menuBar);
         
         information = "<html><h2>Info</h2></html>";
@@ -81,7 +81,7 @@ public class Frame extends JFrame{
     }
     
     private void chooseTrainDataset() {
-        if (!this.canTrainData) {
+        if (!this._canTrainData) {
             //Load train dataset
             setTextLabel("<html><h2 align = 'center'>Loading patterns..</h2></html>");
 
@@ -94,8 +94,8 @@ public class Frame extends JFrame{
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 String filename = chooser.getSelectedFile().getAbsolutePath();
                 this.loadTrainDataset(filename);
-            }else {
-                this.currentFileName = null;
+            } else {
+                this._currentFileName = null;
                 //The user clicks on Cancel button
                 //when we suggest him to select a file from his system
                 setTextLabel("<html><br/><br/><h2 align = 'center'>Data upload canceled</h2></html>");
@@ -109,13 +109,13 @@ public class Frame extends JFrame{
                     Frame.this.chooseTrainDataset();     
                 }
             }
-        }else {
+        } else {
             String text = "Want to load another file now?";
             String title = "Loading..";
             int optionType = JOptionPane.OK_CANCEL_OPTION;
             int result = JOptionPane.showConfirmDialog(null, text, title, optionType);
             if (result == JOptionPane.OK_OPTION) {
-                this.canTrainData = false;
+                this._canTrainData = false;
                 setTextLabel("<html><h2>Load dataset...</h2></html>");
                 Frame.this.chooseTrainDataset();     
             } 
@@ -123,7 +123,7 @@ public class Frame extends JFrame{
     }
     
     private void chooseTestDataset() {
-        if (this.canTrainData) {
+        if (this._canTrainData) {
             //Load test dataset
             setTextLabel("<html><h2 align = 'center'>Loading patterns..</h2></html>");
 
@@ -156,107 +156,107 @@ public class Frame extends JFrame{
     }
     
     private void loadTrainDataset(String filename) {
-        this.currentFileName = filename;
+        this._currentFileName = filename;
         boolean isValid = true;
         ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
         int dimension = -1;
         try {
-                    FileReader file = new FileReader(filename);
-                    try (Scanner in = new Scanner(file)) {
-                        int i = 0;
-                        //Read the file line-by-line
-                        while(in.hasNextLine())  {
-                            if (isValid) {
-                                String line=in.nextLine();
+            FileReader file = new FileReader(filename);
+            try (Scanner in = new Scanner(file)) {
+                int i = 0;
+                //Read the file line-by-line
+                while(in.hasNextLine())  {
+                    if (isValid) {
+                        String line=in.nextLine();
 
-                                ArrayList <Double> newPattern = new ArrayList<>();
-                                String[] characteristics = line.split(",");
-                                if (i == 0) {
-                                    dimension = characteristics.length;
-                                    for (String characteristic : characteristics) {
-                                        newPattern.add(Double.parseDouble(characteristic));
-                                    }
-                                    patterns.add(newPattern);
-                                }else if (characteristics.length == dimension) {
-                                    for (String characteristic : characteristics) {
-                                        newPattern.add(Double.parseDouble(characteristic));
-                                    }
-                                    patterns.add(newPattern);
-                                }else {
-                                    isValid = false;
-                                    this.currentFileName = null;
-                                }
+                        ArrayList <Double> newPattern = new ArrayList<>();
+                        String[] characteristics = line.split(",");
+                        if (i == 0) {
+                            dimension = characteristics.length;
+                            for (String characteristic : characteristics) {
+                                newPattern.add(Double.parseDouble(characteristic));
                             }
-                        }
-
-                        if (isValid) {
-                            this.canTrainData = true;
-                            this.patterns = patterns;
-                            setTextLabel("<html><h2 align = 'center'>Ready Data<br/>Go to Train</h2></html>");
-                        } else {
-                            setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
+                            patterns.add(newPattern);
+                        }else if (characteristics.length == dimension) {
+                            for (String characteristic : characteristics) {
+                                newPattern.add(Double.parseDouble(characteristic));
+                            }
+                            patterns.add(newPattern);
+                        }else {
+                            isValid = false;
+                            this._currentFileName = null;
                         }
                     }
-                }catch (FileNotFoundException | NumberFormatException ex) {
-                    setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
-                    isValid = false;
-                    this.currentFileName = null;
-                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
                 }
+
+                if (isValid) {
+                    this._canTrainData = true;
+                    this._patterns = patterns;
+                    setTextLabel("<html><h2 align = 'center'>Ready Data<br/>Go to Train</h2></html>");
+                } else {
+                    setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
+                }
+            }
+        }catch (FileNotFoundException | NumberFormatException ex) {
+            setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
+            isValid = false;
+            this._currentFileName = null;
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     private void loadTestDataset(String filename) {
         ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
-        int dimension = this.patterns.get(0).size();
+        int dimension = this._patterns.get(0).size();
         boolean isValid = true;
             
         try {
-                    FileReader file = new FileReader(filename);
-                    try (Scanner in = new Scanner(file)) {
-                        //Read the file line-by-line
-                        while(in.hasNextLine())  {
-                            if (isValid) {
-                                String line=in.nextLine();
+            FileReader file = new FileReader(filename);
+            try (Scanner in = new Scanner(file)) {
+                //Read the file line-by-line
+                while(in.hasNextLine())  {
+                    if (isValid) {
+                        String line=in.nextLine();
 
-                                ArrayList <Double> newPattern = new ArrayList<>();
-                                String[] characteristics = line.split(",");
-                                if (characteristics.length == dimension) {
-                                    for (String characteristic : characteristics) {
-                                        newPattern.add(Double.parseDouble(characteristic));
-                                    }
-                                    patterns.add(newPattern);
-                                }else {
-                                    isValid = false;
-                                }
+                        ArrayList <Double> newPattern = new ArrayList<>();
+                        String[] characteristics = line.split(",");
+                        if (characteristics.length == dimension) {
+                            for (String characteristic : characteristics) {
+                                newPattern.add(Double.parseDouble(characteristic));
                             }
-                        }
-
-                        if (isValid) {
-                            this.testPatterns = patterns;
-                            algorithm.setTestPatterns(this.testPatterns);
-                            double testError = algorithm.getTestError();
-                            setTextLabel("<html><h2 align = 'center'>The test dataset has "+testError + " train error</h2></html>");
-                        } else {
-                            setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
+                            patterns.add(newPattern);
+                        }else {
+                            isValid = false;
                         }
                     }
-                } catch (FileNotFoundException | NumberFormatException ex) {
-                    setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
-                    isValid = false;
-                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
                 }
+
+                if (isValid) {
+                    this._testPatterns = patterns;
+                    this._algorithm.setTestPatterns(this._testPatterns);
+                    double testError = this._algorithm.getTestError();
+                    setTextLabel("<html><h2 align = 'center'>The test dataset has "+testError + " train error</h2></html>");
+                } else {
+                    setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
+                }
+            }
+        } catch (FileNotFoundException | NumberFormatException ex) {
+            setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
+            isValid = false;
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     private void train() {
-        if (this.canTrainData) {
+        if (this._canTrainData) {
             int nodes = 1;
             int maxEpoches = 10;
-            algorithm = new Algorithm(this.patterns, nodes, maxEpoches);
-            double train = algorithm.train();
+            this._algorithm = new Algorithm(this._patterns, nodes, maxEpoches);
+            double train = this._algorithm.train();
             if (train != 0.0) {
-                setTextLabel("<html><h2>Trained the train dataset: " +this.currentFileName +"<br/> with train error: " +train+" </h2></html>");
+                setTextLabel("<html><h2>Trained the train dataset: " +this._currentFileName +"<br/> with train error: " +train+" </h2></html>");
             }else {
-                 setTextLabel("<html><h2>Cannot train the train dataset: " +this.currentFileName +"</h2></html>");
+                 setTextLabel("<html><h2>Cannot train the train dataset: " +this._currentFileName +"</h2></html>");
             }
         } else {
             setTextLabel("<html><h2>Cannot train</h2></html>");
