@@ -29,6 +29,7 @@ public class Frame extends JFrame{
     private ArrayList <ArrayList <Double>> _testPatterns = new ArrayList<>();
     private boolean _canTrainData, _trainedData;
     private String _currentFileName;
+    private boolean _defaultIonosphereDatasetLoaded, _defaultLiverPerceptronDatasetLoaded;
     
     Frame(String title) {
         // Configuration of display window
@@ -199,14 +200,36 @@ public class Frame extends JFrame{
                 if (isValid) {
                     this._canTrainData = true;
                     Dataset.setPatterns(patterns);
+                    
+                    switch (filename) {
+                        case "ionosphere_perceptron.train" -> {
+                            this._defaultLiverPerceptronDatasetLoaded = false;
+                            this._defaultIonosphereDatasetLoaded = true;
+                        }
+                        case "liver_perceptron.test" -> {
+                            this._defaultLiverPerceptronDatasetLoaded = true;
+                            this._defaultIonosphereDatasetLoaded = false;
+                        }
+                        default -> {
+                            this._defaultLiverPerceptronDatasetLoaded = false;
+                            this._defaultIonosphereDatasetLoaded = false;
+                        }
+
+
+                    }
+                   
                     setTextLabel("<html><h2 align = 'center'>Ready Data<br/>Go to Train</h2></html>");
                 } else {
+                    this._defaultLiverPerceptronDatasetLoaded = false;
+                    this._defaultIonosphereDatasetLoaded = false;
                     setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
                 }
             }
         }catch (FileNotFoundException | NumberFormatException ex) {
             setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
             isValid = false;
+            this._defaultLiverPerceptronDatasetLoaded = false;
+            this._defaultIonosphereDatasetLoaded = false;
             this._currentFileName = null;
             Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -218,6 +241,21 @@ public class Frame extends JFrame{
             return;
         }
         
+        switch (filename) {
+            case "ionosphere_perceptron.test" -> {
+                if (!this._defaultIonosphereDatasetLoaded) {
+                    setTextLabel("<html><h2>Need to train ionosphere_perceptron.train before</h2></html>");
+                    return;
+                }
+            }
+            case "liver_perceptron.test" -> {
+                 if (!this._defaultLiverPerceptronDatasetLoaded) {
+                    setTextLabel("<html><h2>Need to train liver_perceptron.train before</h2></html>");
+                    return;
+                }
+            }
+
+        }
         
         ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
         int dimension = Dataset.getPatterns().get(0).size();
