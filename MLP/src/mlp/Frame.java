@@ -27,7 +27,7 @@ public class Frame extends JFrame{
     // Fields for training
     private Algorithm _algorithm = new Algorithm();
     private ArrayList <ArrayList <Double>> _testPatterns = new ArrayList<>();
-    private boolean _canTrainData;
+    private boolean _canTrainData, _trainedData;
     private String _currentFileName;
     
     Frame(String title) {
@@ -205,6 +205,12 @@ public class Frame extends JFrame{
     }
     
     private void loadTestDataset(String filename) {
+        if (!this._trainedData || Dataset.getPatterns() == null || Dataset.getPatterns().isEmpty() ) {
+            setTextLabel("<html><h2>Unable to load test data because you have not <br/> trained the network before</h2></html>");
+            return;
+        }
+        
+        
         ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
         int dimension = Dataset.getPatterns().get(0).size();
         boolean isValid = true;
@@ -253,6 +259,7 @@ public class Frame extends JFrame{
             this._algorithm = new Algorithm(nodes, maxEpoches);
             double train = this._algorithm.train();
             if (train != 0.0) {
+                this._trainedData = true;
                 setTextLabel("<html><h2>Trained the train dataset: " +this._currentFileName +"<br/> with train error: " +train+" </h2></html>");
             }else {
                  setTextLabel("<html><h2>Cannot train the train dataset: " +this._currentFileName +"</h2></html>");

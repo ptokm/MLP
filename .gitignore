@@ -24,3 +24,4 @@ hs_err_pid*
 /MLP/dist/
 MLP/nbproject/private/private.properties
 MLP/nbproject/private/private.xml
+MLP/build/built-jar.properties
