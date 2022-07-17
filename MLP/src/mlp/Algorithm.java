@@ -11,16 +11,8 @@ public class Algorithm {
     private int _nodes = 1;
     private int _maxEpoches;
     
-    
-    Algorithm() {
-        this._patterns = Dataset.getPatterns();
-        this._dimension = -1;
-        this._nodes = 1;
-        this._maxEpoches = 0;
-    }
-    
     Algorithm(int nodes, int maxEpoches) {
-        this();
+        this._patterns = Dataset.getPatterns();
         this._dimension = this._patterns.get(0).size() - 1;
         this._nodes = nodes;
         this._maxEpoches = maxEpoches;

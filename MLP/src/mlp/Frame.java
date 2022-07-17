@@ -25,7 +25,7 @@ public class Frame extends JFrame{
     private static JLabel label;
     private final String information, about;
     // Fields for training
-    private Algorithm _algorithm = new Algorithm();
+    private Algorithm _algorithm;
     private ArrayList <ArrayList <Double>> _testPatterns = new ArrayList<>();
     private boolean _canTrainData, _trainedData;
     private String _currentFileName;
@@ -240,7 +240,7 @@ public class Frame extends JFrame{
                     this._testPatterns = patterns;
                     this._algorithm.setTestPatterns(this._testPatterns);
                     double testError = this._algorithm.getTestError();
-                    setTextLabel("<html><h2 align = 'center'>The test dataset has "+testError + " train error</h2></html>");
+                    setTextLabel("<html><h2 align = 'center'>The test dataset has " + testError + " train error</h2></html>");
                 } else {
                     setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
                 }
@@ -260,9 +260,9 @@ public class Frame extends JFrame{
             double train = this._algorithm.train();
             if (train != 0.0) {
                 this._trainedData = true;
-                setTextLabel("<html><h2>Trained the train dataset: " +this._currentFileName +"<br/> with train error: " +train+" </h2></html>");
+                setTextLabel("<html><h2>Trained the train dataset: " + this._currentFileName + "<br/> with train error: " + train + " </h2></html>");
             }else {
-                 setTextLabel("<html><h2>Cannot train the train dataset: " +this._currentFileName +"</h2></html>");
+                 setTextLabel("<html><h2>Cannot train the train dataset: " + this._currentFileName + "</h2></html>");
             }
         } else {
             setTextLabel("<html><h2>Cannot train</h2></html>");
