@@ -166,4 +166,10 @@ public class Algorithm {
         
         return sum;
     }
+    
+    public double trainNewPattern(ArrayList <Double> pattern) {
+        if (pattern.size() != this._dimension)
+            return -1.0;
+        return this.getOutput(pattern);
+    }
 }

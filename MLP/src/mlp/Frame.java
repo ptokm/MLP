@@ -20,8 +20,8 @@ import javax.swing.JOptionPane;
 public class Frame extends JFrame{
     // Fields for GUI
     private final MenuBar menuBar;
-    private final Menu menuMenu, datasetMenu, educationMenu;
-    private final MenuItem[] menuItems, datasetItems, educationItems;
+    private final Menu menuMenu, datasetMenu, educationMenu, educateNewPatternMenu;
+    private final MenuItem[] menuItems, datasetItems, educationItems, educateNewPatternItems;
     private static JLabel label;
     private final String information, about;
     // Fields for training
@@ -39,11 +39,12 @@ public class Frame extends JFrame{
         // much like lines of text in a paragraph
         setLayout(new FlowLayout());
         
-        //Menu configuration
+        // Menu configuration
         menuBar = new MenuBar();
         menuMenu = new Menu("MENU");
         datasetMenu = new Menu("DATASETS");
-        educationMenu = new Menu("TRAIN");
+        educationMenu = new Menu("TRAINING ALGORITHMS");
+        educateNewPatternMenu = new Menu("TRAIN A NEW PATTERN");
         
         menuItems = new MenuItem[2];
         menuItems[0] = new MenuItem("Home");
@@ -66,16 +67,21 @@ public class Frame extends JFrame{
         educationItems[0] = new MenuItem("Back Propagation");
         educationMenu.add(educationItems[0]);
         
+        educateNewPatternItems = new MenuItem[1];
+        educateNewPatternItems[0] = new MenuItem("Load file with new patterns to train");
+        educateNewPatternMenu.add(educateNewPatternItems[0]);
+        
         menuBar.add(menuMenu);
         menuBar.add(datasetMenu);
         menuBar.add(educationMenu);
+        menuBar.add(educateNewPatternMenu);
         setMenuBar(menuBar);
         
         information = "<html><h2>Info</h2></html>";
         
         about = "<html><h2>About</h2></html>";
         
-        //Instructions for users
+        // Instructions for users
         label = new JLabel();
         setTextLabel(information);
         this.add(label);
@@ -83,13 +89,13 @@ public class Frame extends JFrame{
     
     private void chooseTrainDataset() {
         if (!this._canTrainData) {
-            //Load train dataset
+            // Load train dataset
             setTextLabel("<html><h2 align = 'center'>Loading patterns..</h2></html>");
 
-            //Permisions for MAC devices to see files in Download folder
+            // Permisions for MAC devices to see files in Download folder
             System.setProperty("apple.awt.fileDialogForDirectories", "true");
 
-            //Prompt the user to choose a .txt file from his system
+            // Prompt the user to choose a .txt file from his system
             JFileChooser chooser=new JFileChooser();
             int returnVal = chooser.showOpenDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -97,8 +103,8 @@ public class Frame extends JFrame{
                 this.loadTrainDataset(filename);
             } else {
                 this._currentFileName = null;
-                //The user clicks on Cancel button
-                //when we suggest him to select a file from his system
+                // The user clicks on Cancel button
+                // when we suggest him to select a file from his system
                 setTextLabel("<html><br/><br/><h2 align = 'center'>Data upload canceled</h2></html>");
 
                 String text = "Want to load file now?";
@@ -107,7 +113,7 @@ public class Frame extends JFrame{
                 int result = JOptionPane.showConfirmDialog(null, text, title, optionType);
                 if (result == JOptionPane.OK_OPTION) {
                     setTextLabel("<html><h2>Load dataset...</h2></html>");
-                    Frame.this.chooseTrainDataset();     
+                    this.chooseTrainDataset();     
                 }
             }
         } else {
@@ -118,28 +124,28 @@ public class Frame extends JFrame{
             if (result == JOptionPane.OK_OPTION) {
                 this._canTrainData = false;
                 setTextLabel("<html><h2>Load dataset...</h2></html>");
-                Frame.this.chooseTrainDataset();     
+                this.chooseTrainDataset();     
             } 
         }
     }
     
     private void chooseTestDataset() {
         if (this._canTrainData) {
-            //Load test dataset
+            // Load test dataset
             setTextLabel("<html><h2 align = 'center'>Loading patterns..</h2></html>");
 
-            //Permisions for MAC devices to see files in Download folder
+            // Permisions for MAC devices to see files in Download folder
             System.setProperty("apple.awt.fileDialogForDirectories", "true");
 
-            //Prompt the user to choose a .txt file from his system
+            // Prompt the user to choose a .txt file from his system
             JFileChooser chooser=new JFileChooser();
             int returnVal = chooser.showOpenDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 String filename = chooser.getSelectedFile().getAbsolutePath();
                 this.loadTestDataset(filename);
             } else {
-                //The user clicks on Cancel button
-                //when we suggest him to select a file from his system
+                // The user clicks on Cancel button
+                // when we suggest him to select a file from his system
                 setTextLabel("<html><br/><br/><h2 align = 'center'>Data upload canceled</h2></html>");
 
                 String text = "Want to load file now?";
@@ -165,7 +171,7 @@ public class Frame extends JFrame{
             FileReader file = new FileReader(filename);
             try (Scanner in = new Scanner(file)) {
                 int i = 0;
-                //Read the file line-by-line
+                // Read the file line-by-line
                 while(in.hasNextLine())  {
                     if (isValid) {
                         String line=in.nextLine();
@@ -220,7 +226,7 @@ public class Frame extends JFrame{
         try {
             FileReader file = new FileReader(filename);
             try (Scanner in = new Scanner(file)) {
-                //Read the file line-by-line
+                // Read the file line-by-line
                 while(in.hasNextLine())  {
                     if (isValid) {
                         String line=in.nextLine();
@@ -271,7 +277,77 @@ public class Frame extends JFrame{
         }
     }
 
-    //Action depending on the user's choice from the menu
+    private void trainNewPatterns() {
+        if (!this._trainedData) {
+            setTextLabel("<html><h2>Need to train a dataset first</h2></html>");
+            return;
+        }
+        
+        ArrayList <Double> calculatedOutput = new ArrayList <>();
+        // Load new patterns dataset
+        setTextLabel("<html><h2 align = 'center'>Loading new patterns..</h2></html>");
+
+        // Permisions for MAC devices to see files in Download folder
+        System.setProperty("apple.awt.fileDialogForDirectories", "true");
+
+        // Prompt the user to choose a .txt file from his system
+        JFileChooser chooser=new JFileChooser();
+        int returnVal = chooser.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            String filename = chooser.getSelectedFile().getAbsolutePath();
+            
+            try {
+                FileReader file = new FileReader(filename);
+                try (Scanner in = new Scanner(file)) {
+                    int i = 0;
+                    // Read the file line-by-line
+                    while(in.hasNextLine())  {
+                        String line = in.nextLine();
+                        ArrayList <Double> newPattern = new ArrayList<>();
+                        
+                        String[] characteristics = line.split(",");
+                        for (String characteristic : characteristics) {
+                            newPattern.add(Double.parseDouble(characteristic.trim()));
+                        }
+                        calculatedOutput.add(this._algorithm.trainNewPattern(newPattern));
+                        
+                    }
+                }
+            }catch (FileNotFoundException | NumberFormatException ex) {
+                setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
+            }
+            
+            calculatedOutput.forEach(element -> {
+                if (element == -1.0) {
+                    setTextLabel("<html><h2>Something went wrong!</h2></html>");
+                    return;
+                }
+            });
+            
+            String calculatedClasses = "<html><h2><ul>";
+            for (int i = 0; i < calculatedOutput.size(); i++) {
+                calculatedClasses += "<li> Pattern: " + i + " belongs in class: " + calculatedOutput.get(i) + "</li>";
+            }
+            calculatedClasses += "</ul></h2></html>";
+            
+            setTextLabel(calculatedClasses);
+        } else {
+            // The user clicks on Cancel button
+            // when we suggest him to select a file from his system
+            setTextLabel("<html><br/><br/><h2 align = 'center'>New patterns upload canceled</h2></html>");
+
+            String text = "Want to load file now?";
+            String title = "You cancelled loading..";
+            int optionType = JOptionPane.OK_CANCEL_OPTION;
+            int result = JOptionPane.showConfirmDialog(null, text, title, optionType);
+            if (result == JOptionPane.OK_OPTION) {
+                setTextLabel("<html><h2>Load new patterns dataset...</h2></html>");
+                this.trainNewPatterns();     
+            }
+        } 
+    }
+    
+    // Action depending on the user's choice from the menu
     @Override
     public boolean action(Event event, Object obj) {
         if (event.target instanceof MenuItem) {
@@ -286,6 +362,7 @@ public class Frame extends JFrame{
                 case "Load train dataset"                   -> chooseTrainDataset();
                 case "Load test dataset"                    -> chooseTestDataset();
                 case "Back Propagation"                     -> train();
+                case "Load file with new patterns to train" -> trainNewPatterns();
             }
         }
         else
