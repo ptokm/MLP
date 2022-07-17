@@ -9,17 +9,18 @@ public class Algorithm {
     private ArrayList <Double> _uniqueOutputClasses = new ArrayList<>();
     private int _dimension = -1;
     private int _nodes = 1;
-    private final int _maxEpoches;
+    private int _maxEpoches;
+    
     
     Algorithm() {
-        this._patterns = new ArrayList<>();
+        this._patterns = Dataset.getPatterns();
         this._dimension = -1;
         this._nodes = 1;
         this._maxEpoches = 0;
     }
     
-    Algorithm(ArrayList <ArrayList <Double>> patterns, int nodes, int maxEpoches) {
-        this._patterns = patterns;
+    Algorithm(int nodes, int maxEpoches) {
+        this();
         this._dimension = this._patterns.get(0).size() - 1;
         this._nodes = nodes;
         this._maxEpoches = maxEpoches;

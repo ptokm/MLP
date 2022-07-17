@@ -26,7 +26,6 @@ public class Frame extends JFrame{
     private final String information, about;
     // Fields for training
     private Algorithm _algorithm = new Algorithm();
-    private ArrayList <ArrayList <Double>> _patterns = new ArrayList<>();
     private ArrayList <ArrayList <Double>> _testPatterns = new ArrayList<>();
     private boolean _canTrainData;
     private String _currentFileName;
@@ -191,7 +190,7 @@ public class Frame extends JFrame{
 
                 if (isValid) {
                     this._canTrainData = true;
-                    this._patterns = patterns;
+                    Dataset.setPatterns(patterns);
                     setTextLabel("<html><h2 align = 'center'>Ready Data<br/>Go to Train</h2></html>");
                 } else {
                     setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
@@ -207,7 +206,7 @@ public class Frame extends JFrame{
     
     private void loadTestDataset(String filename) {
         ArrayList <ArrayList <Double>> patterns = new ArrayList<>();
-        int dimension = this._patterns.get(0).size();
+        int dimension = Dataset.getPatterns().get(0).size();
         boolean isValid = true;
             
         try {
@@ -251,7 +250,7 @@ public class Frame extends JFrame{
         if (this._canTrainData) {
             int nodes = 1;
             int maxEpoches = 10;
-            this._algorithm = new Algorithm(this._patterns, nodes, maxEpoches);
+            this._algorithm = new Algorithm(nodes, maxEpoches);
             double train = this._algorithm.train();
             if (train != 0.0) {
                 setTextLabel("<html><h2>Trained the train dataset: " +this._currentFileName +"<br/> with train error: " +train+" </h2></html>");
