@@ -437,7 +437,7 @@ public class Frame extends JFrame{
                 case "About"                                -> setTextLabel(about);
                 case "Load ionosphere train dataset"        -> loadTrainDataset("ionosphere_perceptron.train");
                 case "Load ionosphere test dataset"         -> loadTestDataset("ionosphere_perceptron.test");
-                case "Load liver_perceptron train dataset"  -> loadTrainDataset("liver_perceptron.test");
+                case "Load liver_perceptron train dataset"  -> loadTrainDataset("liver_perceptron.train");
                 case "Load liver_perceptron test dataset"   -> loadTestDataset("liver_perceptron.test");
                 case "Load train dataset"                   -> chooseTrainDataset();
                 case "Load test dataset"                    -> chooseTestDataset();
