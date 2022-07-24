@@ -24,3 +24,5 @@ hs_err_pid*
 /MLP/dist/
 MLP/nbproject/private/private.xml
 *.properties
+*.properties
+*.xml

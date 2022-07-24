@@ -175,8 +175,51 @@ public class Frame extends JFrame{
                 // Read the file line-by-line
                 while(in.hasNextLine())  {
                     if (isValid) {
+                        ConfigureAlgorithm.reset();
                         String line=in.nextLine();
 
+                        if (line.startsWith("#")) {
+                            String[] parts = line.split(":");
+                            switch(parts[0]) {
+                                case "# Nodes" -> {
+                                    try{
+                                        ConfigureAlgorithm.setNodes(Integer.parseInt(parts[1].trim()));
+                                    }
+                                    catch (NumberFormatException ex){
+                                        ConfigureAlgorithm.setNodes(1);
+                                    }
+                                    break;
+                                }
+                                case "# Max Epoches" -> {
+                                    try{
+                                        ConfigureAlgorithm.setMaxEpoches(Integer.parseInt(parts[1].trim()));
+                                    }
+                                    catch (NumberFormatException ex){
+                                        ConfigureAlgorithm.setMaxEpoches(100);
+                                    }
+                                    break;
+                                }
+                                case "# Learning rate" -> {
+                                    try{
+                                        ConfigureAlgorithm.setLearning_rate(Double.parseDouble(parts[1].trim()));
+                                    }
+                                    catch (NumberFormatException ex){
+                                        ConfigureAlgorithm.setLearning_rate(0.01);
+                                    }
+                                    
+                                    break;
+                                }
+                                case "# Initialize weights" -> {
+                                    if (parts[1].trim().equals("1.0") || parts[1].trim().equals("0.0"))
+                                        ConfigureAlgorithm.setInitializeWeightsOption(Double.parseDouble(parts[1].trim()));
+                                    else
+                                        ConfigureAlgorithm.setInitializeWeightsOption(1.0);
+                                    break;
+                                }
+                            }
+                            continue;
+                        }
+                        
                         ArrayList <Double> newPattern = new ArrayList<>();
                         String[] characteristics = line.split(",");
                         if (i == 0) {
@@ -214,14 +257,12 @@ public class Frame extends JFrame{
                             this._defaultLiverPerceptronDatasetLoaded = false;
                             this._defaultIonosphereDatasetLoaded = false;
                         }
-
-
-                    }
-                   
+                    }      
                     setTextLabel("<html><h2 align = 'center'>Ready Data<br/>Go to Train</h2></html>");
                 } else {
                     this._defaultLiverPerceptronDatasetLoaded = false;
                     this._defaultIonosphereDatasetLoaded = false;
+                    ConfigureAlgorithm.reset();
                     setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
                 }
             }
@@ -231,6 +272,7 @@ public class Frame extends JFrame{
             this._defaultLiverPerceptronDatasetLoaded = false;
             this._defaultIonosphereDatasetLoaded = false;
             this._currentFileName = null;
+            ConfigureAlgorithm.reset();
             Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

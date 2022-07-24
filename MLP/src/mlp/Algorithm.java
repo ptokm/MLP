@@ -10,19 +10,22 @@ public class Algorithm {
     private int _dimension = -1;
     private int _nodes = 1;
     private final int _maxEpoches;
+    private final double _learningRate;
     
     Algorithm(int nodes, int maxEpoches) {
         this._patterns = Dataset.getPatterns();
         this._dimension = this._patterns.get(0).size() - 1;
-        this._nodes = nodes;
-        this._maxEpoches = maxEpoches;
+        this._nodes = ConfigureAlgorithm.getNodes();
+        this._maxEpoches = ConfigureAlgorithm.getMaxEpoches();
+        this._learningRate = ConfigureAlgorithm.getLearning_rate();
     }
     
     public void initializeWeights() {
         int countOfWeights = (this._dimension + 2) * this._nodes;
         
+        double initWeightsValue = ConfigureAlgorithm.getInitializeWeightsOption();
         for (int i = 0; i < countOfWeights; i++) {
-            this._weights.add(1.0);
+            this._weights.add(initWeightsValue);
         }
     }
     
@@ -118,7 +121,6 @@ public class Algorithm {
             double yx = this._patterns.get(i).get(this._dimension);
             double ox = this.getOutput(this._patterns.get(i));
             
-            
             for (int j = 0; j < deriv.size(); j++) {
                 deriv.set(j, 2.0 * (ox - yx) * patternDeriv.get(j));
             }
@@ -139,7 +141,7 @@ public class Algorithm {
                 ArrayList <Double> deriv = getDeriv();
                 
                 for (int j = 0; j < this._weights.size(); j++) {
-                    this._weights.set(j, this._weights.get(j) * 0.01 * deriv.get(j));
+                    this._weights.set(j, this._weights.get(j) * this._learningRate * deriv.get(j));
                 }
             }
         }
