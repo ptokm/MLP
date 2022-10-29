@@ -1,4 +1,4 @@
-package mlp;
+package Artificial_Neural_Networks;
 
 public class ConfigureAlgorithm {
     private static int nodes = 1;

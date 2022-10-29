@@ -1,8 +1,8 @@
-package mlp;
+package Artificial_Neural_Networks;
 
 import java.util.ArrayList;
 
-public class Algorithm {
+public class MLP {
     private ArrayList <ArrayList <Double>> _patterns = new ArrayList<>(); // The last column is for the desired output
     private ArrayList <ArrayList <Double>> _testPatterns = new ArrayList<>();
     private ArrayList <Double> _weights = new ArrayList<>();
@@ -12,7 +12,7 @@ public class Algorithm {
     private final int _maxEpoches;
     private final double _learningRate;
     
-    Algorithm(int nodes, int maxEpoches) {
+    MLP(int nodes, int maxEpoches) {
         this._patterns = Dataset.getPatterns();
         this._dimension = this._patterns.get(0).size() - 1;
         this._nodes = ConfigureAlgorithm.getNodes();

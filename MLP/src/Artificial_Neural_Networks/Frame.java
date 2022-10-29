@@ -1,4 +1,4 @@
-package mlp;
+package Artificial_Neural_Networks;
 
 import java.awt.Color;
 import java.awt.Event;
@@ -20,12 +20,12 @@ import javax.swing.JOptionPane;
 public class Frame extends JFrame{
     // Fields for GUI
     private final MenuBar menuBar;
-    private final Menu menuMenu, datasetMenu, educationMenu, educateNewPatternMenu;
-    private final MenuItem[] menuItems, datasetItems, educationItems, educateNewPatternItems;
+    private final Menu menuMenu, annMenu, datasetMenu, educationMenu, educateNewPatternMenu;
+    private final MenuItem[] menuItems, annItems, datasetItems, educationItems, educateNewPatternItems;
     private static JLabel label;
     private final String information, about;
     // Fields for training
-    private Algorithm _algorithm;
+    private MLP _mlpAlgorithm;
     private ArrayList <ArrayList <Double>> _testPatterns = new ArrayList<>();
     private boolean _canTrainData, _trainedData;
     private String _currentFileName;
@@ -43,6 +43,7 @@ public class Frame extends JFrame{
         // Menu configuration
         menuBar = new MenuBar();
         menuMenu = new Menu("MENU");
+        annMenu = new Menu("Artificial Neural Netoworks");
         datasetMenu = new Menu("DATASETS");
         educationMenu = new Menu("TRAINING ALGORITHMS");
         educateNewPatternMenu = new Menu("TRAIN A NEW PATTERN");
@@ -50,10 +51,16 @@ public class Frame extends JFrame{
         menuItems = new MenuItem[2];
         menuItems[0] = new MenuItem("Home");
         menuItems[1] = new MenuItem("About");
-        for (short i=0; i<menuItems.length; i++) {
+        for (short i=0; i < menuItems.length; i++) {
             menuMenu.add(menuItems[i]);
         }
         
+        annItems = new MenuItem[1];
+        annItems[0] = new MenuItem("Multi Layer Perceptron");
+        for (short i=0; i < annItems.length; i++) {
+            annMenu.add(annItems[i]);
+        }
+         
         datasetItems = new MenuItem[6];
         datasetItems[0] = new MenuItem("Load ionosphere train dataset");
         datasetItems[1] = new MenuItem("Load ionosphere test dataset");
@@ -73,6 +80,7 @@ public class Frame extends JFrame{
         educateNewPatternMenu.add(educateNewPatternItems[0]);
         
         menuBar.add(menuMenu);
+        menuBar.add(annMenu);
         menuBar.add(datasetMenu);
         menuBar.add(educationMenu);
         menuBar.add(educateNewPatternMenu);
@@ -326,8 +334,8 @@ public class Frame extends JFrame{
 
                 if (isValid) {
                     this._testPatterns = patterns;
-                    this._algorithm.setTestPatterns(this._testPatterns);
-                    double testError = this._algorithm.getTestError();
+                    this._mlpAlgorithm.setTestPatterns(this._testPatterns);
+                    double testError = this._mlpAlgorithm.getTestError();
                     setTextLabel("<html><h2 align = 'center'>The test dataset has " + testError + " train error</h2></html>");
                 } else {
                     setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
@@ -344,8 +352,8 @@ public class Frame extends JFrame{
         if (this._canTrainData) {
             int nodes = 1;
             int maxEpoches = 10;
-            this._algorithm = new Algorithm(nodes, maxEpoches);
-            double train = this._algorithm.train();
+            this._mlpAlgorithm = new MLP(nodes, maxEpoches);
+            double train = this._mlpAlgorithm.train();
             if (train != 0.0) {
                 this._trainedData = true;
                 setTextLabel("<html><h2>Trained the train dataset: " + this._currentFileName + "<br/> with train error: " + train + " </h2></html>");
@@ -389,7 +397,7 @@ public class Frame extends JFrame{
                         for (String characteristic : characteristics) {
                             newPattern.add(Double.parseDouble(characteristic.trim()));
                         }
-                        calculatedOutput.add(this._algorithm.trainNewPattern(newPattern));
+                        calculatedOutput.add(this._mlpAlgorithm.trainNewPattern(newPattern));
                         
                     }
                 }

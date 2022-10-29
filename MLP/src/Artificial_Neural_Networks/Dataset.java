@@ -1,4 +1,4 @@
-package mlp;
+package Artificial_Neural_Networks;
 
 import java.util.ArrayList;
 
