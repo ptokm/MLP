@@ -25,7 +25,7 @@ public class Frame extends JFrame{
     private static JLabel label;
     private final String information, about;
     // Fields for training
-    private MLP _mlpAlgorithm;
+    private MLP _mlp;
     private ArrayList <ArrayList <Double>> _testPatterns = new ArrayList<>();
     private boolean _canTrainData, _trainedData;
     private String _currentFileName;
@@ -193,27 +193,21 @@ public class Frame extends JFrame{
                                     try{
                                         ConfigureAlgorithm.setNodes(Integer.parseInt(parts[1].trim()));
                                     }
-                                    catch (NumberFormatException ex){
-                                        ConfigureAlgorithm.setNodes(1);
-                                    }
+                                    catch (NumberFormatException ex){}
                                     break;
                                 }
                                 case "# Max Epoches" -> {
                                     try{
                                         ConfigureAlgorithm.setMaxEpoches(Integer.parseInt(parts[1].trim()));
                                     }
-                                    catch (NumberFormatException ex){
-                                        ConfigureAlgorithm.setMaxEpoches(100);
-                                    }
+                                    catch (NumberFormatException ex){}
                                     break;
                                 }
                                 case "# Learning rate" -> {
                                     try{
                                         ConfigureAlgorithm.setLearning_rate(Double.parseDouble(parts[1].trim()));
                                     }
-                                    catch (NumberFormatException ex){
-                                        ConfigureAlgorithm.setLearning_rate(0.01);
-                                    }
+                                    catch (NumberFormatException ex){}
                                     
                                     break;
                                 }
@@ -227,7 +221,7 @@ public class Frame extends JFrame{
                             }
                             continue;
                         }
-                        
+                         
                         ArrayList <Double> newPattern = new ArrayList<>();
                         String[] characteristics = line.split(",");
                         if (i == 0) {
@@ -334,8 +328,8 @@ public class Frame extends JFrame{
 
                 if (isValid) {
                     this._testPatterns = patterns;
-                    this._mlpAlgorithm.setTestPatterns(this._testPatterns);
-                    double testError = this._mlpAlgorithm.getTestError();
+                    this._mlp.setTestPatterns(this._testPatterns);
+                    double testError = this._mlp.getTestError();
                     setTextLabel("<html><h2 align = 'center'>The test dataset has " + testError + " train error</h2></html>");
                 } else {
                     setTextLabel("<html><h2 align = 'center'>Something went wrong</h2></html>");
@@ -350,10 +344,8 @@ public class Frame extends JFrame{
     
     private void train() {
         if (this._canTrainData) {
-            int nodes = 1;
-            int maxEpoches = 10;
-            this._mlpAlgorithm = new MLP(nodes, maxEpoches);
-            double train = this._mlpAlgorithm.train();
+            this._mlp = new MLP();
+            double train = this._mlp.train();
             if (train != 0.0) {
                 this._trainedData = true;
                 setTextLabel("<html><h2>Trained the train dataset: " + this._currentFileName + "<br/> with train error: " + train + " </h2></html>");
@@ -397,7 +389,7 @@ public class Frame extends JFrame{
                         for (String characteristic : characteristics) {
                             newPattern.add(Double.parseDouble(characteristic.trim()));
                         }
-                        calculatedOutput.add(this._mlpAlgorithm.trainNewPattern(newPattern));
+                        calculatedOutput.add(this._mlp.trainNewPattern(newPattern));
                         
                     }
                 }

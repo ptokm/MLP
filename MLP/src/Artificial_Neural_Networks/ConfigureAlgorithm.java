@@ -1,11 +1,18 @@
 package Artificial_Neural_Networks;
 
 public class ConfigureAlgorithm {
-    private static int nodes = 1;
-    private static int maxEpoches = 100;
-    private static double learning_rate = 0.01;
-    private static double initializeWeightsOption = 1.0;
+    private static int nodes;
+    private static int maxEpoches;
+    private static double learning_rate;
+    private static double initializeWeightsOption;
 
+    public static void reset() {
+        setNodes(10);
+        setMaxEpoches(100);
+        setLearning_rate(0.01);
+        setInitializeWeightsOption(1.0);
+    }
+    
     /**
      * @return the nodes
      */
@@ -60,12 +67,5 @@ public class ConfigureAlgorithm {
      */
     public static void setInitializeWeightsOption(double aInitializeWeightsOption) {
         initializeWeightsOption = aInitializeWeightsOption;
-    }
-    
-    public static void reset() {
-        nodes = 1;
-        maxEpoches = 100;
-        learning_rate = 0.01;
-        setInitializeWeightsOption(1.0);
     }
 }

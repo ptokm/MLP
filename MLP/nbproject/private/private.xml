@@ -3,11 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/paras/GitHub/MLP/MLP/src/mlp/Frame.java</file>
-            <file>file:/C:/Users/paras/GitHub/MLP/MLP/src/mlp/Algorithm.java</file>
-            <file>file:/C:/Users/paras/GitHub/MLP/MLP/src/mlp/ConfigureAlgorithm.java</file>
-            <file>file:/C:/Users/paras/GitHub/MLP/MLP/src/mlp/Dataset.java</file>
-            <file>file:/C:/Users/paras/GitHub/MLP/MLP/src/mlp/MLP.java</file>
+            <file>file:/C:/Users/paras/GitHub/MLP/MLP/src/Artificial_Neural_Networks/Frame.java</file>
+            <file>file:/C:/Users/paras/GitHub/MLP/MLP/src/Optimization_Algorithms/Genetic_Algorithm/GA.java</file>
+            <file>file:/C:/Users/paras/GitHub/MLP/MLP/src/Artificial_Neural_Networks/Dataset.java</file>
+            <file>file:/C:/Users/paras/GitHub/MLP/MLP/src/Artificial_Neural_Networks/Artificial_Neural_Networks.java</file>
+            <file>file:/C:/Users/paras/GitHub/MLP/MLP/src/Artificial_Neural_Networks/MLP.java</file>
+            <file>file:/C:/Users/paras/GitHub/MLP/MLP/src/Artificial_Neural_Networks/ConfigureAlgorithm.java</file>
         </group>
     </open-files>
 </project-private>

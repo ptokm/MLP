@@ -1,5 +1,6 @@
 package Artificial_Neural_Networks;
 
+import Optimization_Algorithms.Genetic_Algorithm.GA;
 import java.util.ArrayList;
 
 public class MLP {
@@ -7,12 +8,12 @@ public class MLP {
     private ArrayList <ArrayList <Double>> _testPatterns = new ArrayList<>();
     private ArrayList <Double> _weights = new ArrayList<>();
     private ArrayList <Double> _uniqueOutputClasses = new ArrayList<>();
-    private int _dimension = -1;
-    private int _nodes = 1;
+    private int _dimension;
+    private int _nodes;
     private final int _maxEpoches;
     private final double _learningRate;
     
-    MLP(int nodes, int maxEpoches) {
+    MLP() {
         this._patterns = Dataset.getPatterns();
         this._dimension = this._patterns.get(0).size() - 1;
         this._nodes = ConfigureAlgorithm.getNodes();
